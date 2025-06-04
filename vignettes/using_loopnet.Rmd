@@ -1,0 +1,42 @@
+---
+title: "Using loopnet: Directed Network Simulation and Feedback Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using loopnet}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```r
+# Load the loopnet package (after installation)
+library(loopnet)
+
+# Step 1: Create an undirected adjacency matrix (skeleton)
+adj <- matrix(0, 9, 9)
+adj[1, 2] <- adj[2, 1] <- 1
+adj[2, 3] <- adj[3, 2] <- 1
+adj[3, 4] <- adj[4, 3] <- 1
+adj[4, 5] <- adj[5, 4] <- 1
+adj[5, 6] <- adj[6, 5] <- 1
+adj[6, 1] <- adj[1, 6] <- 1
+
+# Step 2: Generate all possible directed networks
+nets <- generate_directed_networks(adj)
+length(nets)  # Total configurations
+
+# Step 3: Select one network and detect feedback loops
+net1 <- nets[[1]]
+loops <- detect_feedback_loops(net1)
+str(loops)
+
+# Step 4: Compute overlap and topological features
+overlap <- compute_overlap_metrics(loops, n_nodes = nrow(adj))
+topo <- summarize_topology(net1, loops)
+
+# Step 5: Simulate dynamics from this network
+params <- get_sample_parameters()
+S <- simulate_from_network(net1, params, t_max = 50)
+plot_symptom_dynamics(S)
+```
+
+This vignette walks through the end-to-end use of `loopnet`, from generating directed networks to simulating dynamic behavior and analyzing feedback loop structure.
