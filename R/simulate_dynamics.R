@@ -10,11 +10,14 @@
 #' @param dt Time step.
 #' @param S0 Initial symptom intensities (default 0.01).
 #' @return A matrix of simulated symptom intensities over time (rows = time, cols = symptoms).
-#' @export
 #' @importFrom stats rnorm
-
+#' @export
 simulate_dynamics <- function(adj_matrix, beta, alpha_self, delta, sigma, t_max = 100, dt = 0.1, S0 = NULL) {
   n <- nrow(adj_matrix)
+  if (any(c(length(beta), length(alpha_self), length(delta), length(sigma)) != n)) {
+    stop("All parameter vectors (beta, alpha_self, delta, sigma) must have the same length as the number of nodes in the network.")
+  }
+
   n_steps <- floor(t_max / dt)
   S <- matrix(0, n_steps + 1, n)
   if (is.null(S0)) S[1, ] <- rep(0.01, n) else S[1, ] <- S0
@@ -22,7 +25,7 @@ simulate_dynamics <- function(adj_matrix, beta, alpha_self, delta, sigma, t_max 
   for (t in 1:n_steps) {
     current <- S[t, ]
     interaction <- adj_matrix %*% current
-    dS <- current * (1 - current) *
+    dS <- current * (1 - current) * 
       (beta + alpha_self * current + interaction * (1 + delta * current)) * dt +
       sigma * sqrt(dt) * rnorm(n)
     S[t + 1, ] <- pmin(pmax(current + dS, 0), 1)
