@@ -1,3 +1,5 @@
+![R-CMD-check](https://github.com/KyuriP/causalnet/actions/workflows/R-CMD-check.yaml/badge.svg)
+
 # loopnet
 
 `loopnet` is an R package for generating and analyzing all possible directed networks from a given undirected skeleton. It is especially useful for studying feedback loops in systems such as symptom networks in mental health.
