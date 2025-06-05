@@ -20,6 +20,6 @@ jobs:
       
       - name: Check package
         run: |
-          R CMD check .
+          R CMD check --no-manual .
 
 
