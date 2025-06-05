@@ -2,16 +2,20 @@
 % Please edit documentation in R/generate_directed_networks.R
 \name{generate_directed_networks}
 \alias{generate_directed_networks}
-\title{Generate All Directed Networks from a Skeleton (qgraph version)}
+\title{Generate All Directed Networks with Optional Bidirectional Edges}
 \usage{
-generate_directed_networks(adj_matrix)
+generate_directed_networks(adj_matrix, allow_bidirectional = TRUE)
 }
 \arguments{
 \item{adj_matrix}{A symmetric adjacency matrix representing the undirected skeleton.}
+
+\item{allow_bidirectional}{Logical. If TRUE, include bidirectional (A <-> B) edge options.}
 }
 \value{
-A list of adjacency matrices representing all possible directed networks.
+A list of unique directed adjacency matrices.
 }
 \description{
-Given an undirected adjacency matrix, generate all possible directed versions using qgraph.
+Given an undirected adjacency matrix, generate all valid directed versions,
+optionally including bidirectional edges (2-node feedback loops).
+Redundant networks due to symmetric bidirectional flips are removed.
 }

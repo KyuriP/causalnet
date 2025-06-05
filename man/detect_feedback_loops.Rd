@@ -2,16 +2,28 @@
 % Please edit documentation in R/detect_feedback_loops.R
 \name{detect_feedback_loops}
 \alias{detect_feedback_loops}
-\title{Detect Feedback Loops}
+\title{Detect Feedback Loops (Cycles) in a Directed Network}
 \usage{
 detect_feedback_loops(adj_matrix)
 }
 \arguments{
-\item{adj_matrix}{A directed adjacency matrix.}
+\item{adj_matrix}{A square adjacency matrix representing a directed network.
+Non-zero entries indicate directed edges.}
 }
 \value{
-A list of cycles, each represented as a vector of node indices.
+A list of feedback loops. Each loop is a vector of node indices (1-based).
+Each loop appears only once in canonical order.
 }
 \description{
-Detect cycles (feedback loops) in a directed adjacency matrix.
+This function finds all feedback loops (i.e., directed cycles) in a directed adjacency matrix.
+It includes both multi-node and 2-node bidirectional cycles, while avoiding duplicate reporting
+of the same logical loop in different orders.
+}
+\examples{
+adj <- matrix(0, 3, 3)
+adj[1, 2] <- 1
+adj[2, 3] <- 1
+adj[3, 1] <- 1  # Forms a cycle: 1 -> 2 -> 3 -> 1
+detect_feedback_loops(adj)
+
 }
