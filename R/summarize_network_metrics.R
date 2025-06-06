@@ -51,6 +51,11 @@ summarize_network_metrics <- function(net_list) {
 }
 
 
+# Declare global vars to avoid R CMD check NOTE
+utils::globalVariables(c(
+  "num_loops", "sigma_total", "node_overlap_score", "avg_loop_size"
+))
+
 
 #' Plot Network Metrics Summary (ggplot2 version)
 #'
@@ -62,6 +67,7 @@ summarize_network_metrics <- function(net_list) {
 #' @importFrom ggplot2 ggplot aes geom_histogram geom_jitter geom_violin labs theme_minimal
 #' @importFrom ggplot2 scale_x_continuous
 #' @importFrom cowplot plot_grid
+#' @importFrom stats na.omit
 
 plot_network_metrics <- function(summary_df) {
 

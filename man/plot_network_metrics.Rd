@@ -2,7 +2,7 @@
 % Please edit documentation in R/summarize_network_metrics.R
 \name{plot_network_metrics}
 \alias{plot_network_metrics}
-\title{Plot Network Metrics Summary}
+\title{Plot Network Metrics Summary (ggplot2 version)}
 \usage{
 plot_network_metrics(summary_df)
 }
@@ -10,8 +10,8 @@ plot_network_metrics(summary_df)
 \item{summary_df}{A data frame returned by \code{summarize_network_metrics()}.}
 }
 \value{
-A grid of base R plots.
+A grid of ggplot2 visualizations.
 }
 \description{
-Visualize summary statistics across a set of directed networks.
+Visualize summary statistics across a set of directed networks using ggplot2.
 }
