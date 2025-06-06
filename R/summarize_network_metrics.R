@@ -52,50 +52,54 @@ summarize_network_metrics <- function(net_list) {
 
 
 
-#' Plot Network Metrics Summary
+#' Plot Network Metrics Summary (ggplot2 version)
 #'
-#' Visualize summary statistics across a set of directed networks.
+#' Visualize summary statistics across a set of directed networks using ggplot2.
 #'
 #' @param summary_df A data frame returned by `summarize_network_metrics()`.
-#' @return A grid of base R plots.
-#' @importFrom graphics par hist
-
+#' @return A grid of ggplot2 visualizations.
 #' @export
+#' @importFrom ggplot2 ggplot aes geom_histogram geom_jitter geom_violin labs theme_minimal
+#' @importFrom ggplot2 scale_x_continuous
+#' @importFrom cowplot plot_grid
+
 plot_network_metrics <- function(summary_df) {
-  old_par <- par(no.readonly = TRUE)
-  on.exit(par(old_par))
 
-  par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
+  # Plot 1: Distribution of number of loops
+  p1 <- ggplot(summary_df, aes(x = num_loops)) +
+    geom_histogram(binwidth = 1, fill = "skyblue", color = "black", alpha = 0.8) +
+    labs(title = "Distribution of Feedback Loops",
+         x = "Number of Loops", y = "Frequency") +
+    theme_minimal()
 
-  # Plot 1: Histogram of number of loops
-  hist(summary_df$num_loops,
-       breaks = 10,
-       main = "Distribution of Feedback Loops",
-       xlab = "Number of Loops",
-       col = "skyblue")
+  # Plot 2: Degree variability distribution per number of loops
+  p2 <- ggplot(summary_df, aes(x = factor(num_loops), y = sigma_total)) +
+    #geom_violin(fill = "lightgreen", alpha = 0.4, color = NA) +
+    geom_jitter(width = 0.2, size = 1, color = "darkgreen", alpha = 0.8) +
+    labs(title = "Degree Variability by Loop Count",
+         x = "Number of Loops", y = "Sigma Total") +
+    theme_minimal()
 
-  # Plot 2: Scatterplot of loops vs. sigma_total
-  plot(summary_df$num_loops, summary_df$sigma_total,
-       main = "Loops vs Degree Variability",
-       xlab = "Number of Loops",
-       ylab = "Sigma Total",
-       pch = 19, col = "darkgreen")
+  # Plot 3: Node overlap score distribution
+  p3 <- ggplot(summary_df, aes(x = node_overlap_score)) +
+    geom_histogram(binwidth = 0.2, fill = "orange", color = "black", alpha = 0.8) +
+    labs(title = "Node Overlap Score",
+         x = "Overlap Index", y = "Frequency") +
+    theme_minimal()
 
-  # Plot 3: Histogram of node overlap score
-  hist(summary_df$node_overlap_score,
-       breaks = 10,
-       main = "Node Overlap Score",
-       xlab = "Overlap Index",
-       col = "orange")
+  # Plot 4: Average loop size (omit NA)
+  p4 <- ggplot(na.omit(summary_df), aes(x = avg_loop_size)) +
+    geom_histogram(binwidth = 0.2, fill = "lightcoral", color = "black", alpha = 0.8) +
+    labs(title = "Average Loop Size",
+         x = "Loop Size", y = "Frequency") +
+    theme_minimal()
 
-  # Plot 4: Histogram of average loop size
-  hist(summary_df$avg_loop_size,
-       breaks = 10,
-       main = "Average Loop Size",
-       xlab = "Loop Size",
-       col = "lightcoral")
-}
-
-# Example usage (if `summary_df` is available):
-# summary_df <- summarize_network_metrics(nets)
-# plot_network_metrics(summary_df)
+  # Arrange in 2x2 grid
+  # Arrange with subplot tags
+  cowplot::plot_grid(
+    p1, p2, p3, p4,
+    labels = c("a", "b", "c", "d"),
+    label_size = 14,
+    ncol = 2
+  )
+  }
