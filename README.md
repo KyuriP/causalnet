@@ -1,42 +1,52 @@
 ![R-CMD-check](https://github.com/KyuriP/causalnet/actions/workflows/R-CMD-check.yaml/badge.svg)
 
-# loopnet
+# causalnet
 
-`loopnet` is an R package for generating and analyzing all possible directed networks from a given undirected skeleton. It is especially useful for studying feedback loops in systems such as symptom networks in mental health.
+`causalnet` is an R package for enumerating and analyzing all possible directed causal networks generated from an undirected skeleton. It is particularly useful for exploring feedback loops and simulating dynamic processes such as interactions between the nodes.
 
-## 🔧 Installation
+## Installation
 
 You can install the development version from GitHub using:
 
 ```r
-# Install devtools if not already installed
-install.packages("devtools")
-
-# Install loopnet from GitHub
-devtools::install_github("your-username/loopnet")
+# Install causalnet from GitHub
+devtools::install_github("KyuriP/causalnet")
 ```
 
-## 📘 Vignette
+## Vignette
 
-After installation, run:
+A full demonstration is available via:
 
 ```r
-browseVignettes("loopnet")
+quarto::quarto_preview("vignettes/causalnet_demo.qmd")
 ```
+Or view the rendered HTML version here:
+👉 <a href="vignettes/causalnet_demo.html" target="_blank">View Demo</a>
 
-## 🚀 Features
+## Key Features
 
-- Generate all directed versions of a given undirected network skeleton
-- Detect feedback loops (cycles)
-- Analyze network topology
-- Simulate symptom dynamics using SDEs
-- Visualize simulation results
+- Enumerate all possible directed networks given an undirected skeleton
 
-## 📂 Example
+- Detect feedback loops (directed cycles) in networks
 
-See `vignettes/using_loopnet.Rmd` for a full usage walkthrough.
+- Analyze network topology using custom structural metrics
 
-## 🧪 CI/CD (Optional)
+- Simulate symptom dynamics using stochastic differential equations (SDEs)
 
-You can integrate GitHub Actions for automated checks by adding a `.github/workflows/R-CMD-check.yaml` file.
+- Visualize network metrics and symptom trajectories (with optional stress inputs)
+
+## Example Workflow
+
+1. Define a network skeleton
+
+2. Generate all directed variants
+
+3. Detect loops and summarize metrics
+
+4. Pick representative networks (e.g., no loops vs. many loops)
+
+5. Simulate symptom dynamics with/without external stressors
+
+6. Plot dynamic trajectories and compare metrics
+
 
