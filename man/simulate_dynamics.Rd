@@ -2,39 +2,66 @@
 % Please edit documentation in R/simulate_dynamics.R
 \name{simulate_dynamics}
 \alias{simulate_dynamics}
-\title{Simulate Symptom Dynamics Using SDEs}
+\title{Simulate Symptom Dynamics Using SDEs (Park et al. 2025 Model or Custom)}
 \usage{
 simulate_dynamics(
   adj_matrix,
-  beta,
-  alpha_self,
-  delta,
-  sigma,
+  params,
   t_max = 100,
   dt = 0.1,
-  S0 = NULL
+  S0 = NULL,
+  model_fn = NULL,
+  stress_event = NULL
 )
 }
 \arguments{
 \item{adj_matrix}{A directed adjacency matrix representing the network.}
 
-\item{beta}{A numeric vector of symptom sensitivity values.}
-
-\item{alpha_self}{A numeric vector of self-feedback weights.}
-
-\item{delta}{A numeric vector for non-linear amplification effects.}
-
-\item{sigma}{A numeric vector of noise levels.}
+\item{params}{A named list of model parameters. For the default model, this must include:
+\itemize{
+\item \code{beta}: Vector of excitatory weights from other nodes.
+\item \code{alpha_self}: Vector of self-activation parameters.
+\item \code{delta}: Vector controlling non-linear amplification of incoming effects.
+\item \code{sigma}: Vector of Gaussian noise levels for each node.
+}
+For a custom model, this can include any named parameters used inside your model function.}
 
 \item{t_max}{Total simulation time.}
 
-\item{dt}{Time step.}
+\item{dt}{Simulation time step size.}
 
-\item{S0}{Initial symptom intensities (default 0.01).}
+\item{S0}{Optional initial symptom levels. If \code{NULL}, defaults to a small constant (0.01) for all nodes.}
+
+\item{model_fn}{Optional. A custom function with signature \code{function(current, interaction, dt, ...)}
+that returns a vector of delta changes \code{dS}. The function should handle its own parameter inputs
+passed through \code{params}.}
+
+\item{stress_event}{Optional. A function of the form \code{function(time, state)} that returns a stress input
+vector to be added at each time step. Useful for modeling external shocks.}
 }
 \value{
-A matrix of simulated symptom intensities over time (rows = time, cols = symptoms).
+A numeric matrix of symptom intensities over time. Rows = time steps, Columns = nodes.
 }
 \description{
-Simulates symptom dynamics over time based on a system of stochastic differential equations (SDEs).
+Simulates the evolution of symptom dynamics in a network using stochastic differential equations (SDEs).
+Users may use the default model from Park et al. (2025), or provide a custom model function.
+}
+\examples{
+# Using the default model
+net <- matrix(c(0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1,
+                1, 0, 0, 0), nrow = 4, byrow = TRUE)
+params <- get_sample_parameters(n_nodes = 4)
+S <- simulate_dynamics(net, params)
+
+# Using a custom model
+my_model <- function(current, interaction, dt, beta, sigma) {
+  drift <- beta * interaction * dt
+  noise <- sigma * sqrt(dt) * rnorm(length(current))
+  drift + noise
+}
+custom_params <- list(beta = rep(0.8, 4), sigma = rep(0.05, 4))
+S2 <- simulate_dynamics(net, custom_params, model_fn = my_model)
+
 }

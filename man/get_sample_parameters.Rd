@@ -2,13 +2,43 @@
 % Please edit documentation in R/simulation_utils.R
 \name{get_sample_parameters}
 \alias{get_sample_parameters}
-\title{Get Sample Parameters for Simulation}
+\title{Generate Sample Parameters for Node Dynamics}
 \usage{
-get_sample_parameters()
+get_sample_parameters(
+  n_nodes,
+  beta_range = c(-1.5, -1),
+  alpha_range = c(0.05, 0.3),
+  delta_range = c(1, 5),
+  sigma_range = c(0.01, 0.1),
+  beta = NULL,
+  alpha_self = NULL,
+  delta = NULL,
+  sigma = NULL
+)
+}
+\arguments{
+\item{n_nodes}{Number of nodes in the network.}
+
+\item{beta_range}{Range for inter-node influence (used if \code{beta} is NULL).}
+
+\item{alpha_range}{Range for self-activation (used if \code{alpha_self} is NULL).}
+
+\item{delta_range}{Range for amplification (used if \code{delta} is NULL).}
+
+\item{sigma_range}{Range for noise (used if \code{sigma} is NULL).}
+
+\item{beta}{Optional vector of fixed beta values.}
+
+\item{alpha_self}{Optional vector of fixed alpha_self values.}
+
+\item{delta}{Optional vector of fixed delta values.}
+
+\item{sigma}{Optional vector of fixed sigma values.}
 }
 \value{
-A list with beta, alpha_self, delta, sigma.
+A named list of parameter vectors.
 }
 \description{
-Returns sample parameters for a 9-node symptom network based on the referenced paper.
+This function returns a list of simulation parameters for symptom dynamics.
+Users can either specify value ranges to sample from, or provide fixed values.
 }
