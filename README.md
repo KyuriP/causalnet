@@ -20,8 +20,6 @@ A full demonstration is available via:
 ```r
 quarto::quarto_preview("vignettes/causalnet_demo.qmd")
 ```
-Or view the rendered HTML version here:
-👉 <a href="vignettes/causalnet_demo.html" target="_blank">View Demo</a>
 
 ## Key Features
 
