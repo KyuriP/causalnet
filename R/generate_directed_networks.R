@@ -16,24 +16,6 @@
 #'
 #' @return A list of unique directed adjacency matrices consistent with the input structure and constraints.
 #'
-#' @examples
-#' # Define a triangle network skeleton
-#' adj <- matrix(0, 3, 3)
-#' adj[1, 2] <- adj[2, 1] <- 1
-#' adj[2, 3] <- adj[3, 2] <- 1
-#' adj[3, 1] <- adj[1, 3] <- 1
-#'
-#' # Generate all directed versions
-#' nets_all <- generate_directed_networks(adj)
-#' length(nets_all)
-#'
-#' # Fix A -> B and C <-> A
-#' fixed <- matrix(NA, 3, 3)
-#' fixed[1, 2] <- 1  # A → B
-#' fixed[3, 1] <- 2  # C ↔ A
-#' nets_fixed <- generate_directed_networks(adj, allow_bidirectional = TRUE, fixed_edges = fixed)
-#' length(nets_fixed)
-#'
 #' @export
 
 generate_directed_networks <- function(adj_matrix, allow_bidirectional = TRUE, fixed_edges = NULL) {
@@ -49,17 +31,28 @@ generate_directed_networks <- function(adj_matrix, allow_bidirectional = TRUE, f
     if (!all(dim(fixed_edges) == dim(adj_matrix))) {
       stop("fixed_edges must match adj_matrix dimensions.")
     }
+
+    # Enforce asymmetry: If i→j is fixed, then j→i is forbidden unless bidirectional
+    for (i in 1:n_nodes) {
+      for (j in 1:n_nodes) {
+        if (!is.na(fixed_edges[i, j]) && fixed_edges[i, j] == 1 && is.na(fixed_edges[j, i])) {
+          fixed_edges[j, i] <- -1  # Forbidden
+        }
+        if (!is.na(fixed_edges[i, j]) && fixed_edges[i, j] == 2 && is.na(fixed_edges[j, i])) {
+          fixed_edges[j, i] <- 2   # Symmetric for bidirectional
+        }
+      }
+    }
   }
 
-  # Identify all unique undirected edges in upper triangle
+  # Identify all unique undirected edges
   edge_list <- which(upper.tri(adj_matrix) & adj_matrix != 0, arr.ind = TRUE)
   n_edges <- nrow(edge_list)
 
-  # Define possible direction options for each edge:
-  # 0 = A→B, 1 = B→A, 2 = A↔B (if allowed)
+  # Set direction options
   direction_options <- if (allow_bidirectional) 0:2 else 0:1
 
-  # Generate full combination grid of edge directions
+  # All combinations of edge directions
   directions <- expand.grid(rep(list(direction_options), n_edges))
 
   unique_networks <- list()
@@ -74,26 +67,38 @@ generate_directed_networks <- function(adj_matrix, allow_bidirectional = TRUE, f
       to <- edge_list[j, 2]
       dir <- directions[i, j]
 
-      # Check fixed constraints (both directions)
       constraint <- fixed_edges[from, to]
       reverse_constraint <- fixed_edges[to, from]
 
-      # Enforce fixed direction or bidirectional edge, if specified
+      # Handle constraint enforcement
       if (!is.na(constraint) || !is.na(reverse_constraint)) {
+
+        # A → B required
         if (!is.na(constraint) && constraint == 1 && dir != 0) {
           valid <- FALSE; break
         }
+
+        # B → A required
         if (!is.na(reverse_constraint) && reverse_constraint == 1 && dir != 1) {
           valid <- FALSE; break
         }
+
+        # A ↔ B required
         if ((!is.na(constraint) && constraint == 2) || (!is.na(reverse_constraint) && reverse_constraint == 2)) {
-          if (dir != 2) {
-            valid <- FALSE; break
-          }
+          if (dir != 2) { valid <- FALSE; break }
+        }
+
+        # A → B enforced, B → A explicitly forbidden
+        if ((!is.na(reverse_constraint) && reverse_constraint == -1) && dir == 1) {
+          valid <- FALSE; break
+        }
+
+        if ((!is.na(constraint) && constraint == -1) && dir == 0) {
+          valid <- FALSE; break
         }
       }
 
-      # Build the directed adjacency matrix for this direction
+      # Apply direction to matrix
       if (dir == 0) {
         mat[from, to] <- adj_matrix[from, to]
       } else if (dir == 1) {
@@ -106,7 +111,7 @@ generate_directed_networks <- function(adj_matrix, allow_bidirectional = TRUE, f
 
     if (!valid) next
 
-    # Hash to avoid duplicates due to flipped symmetric networks
+    # Remove duplicates using string hashing
     hash <- paste(mat, collapse = "")
     if (!(hash %in% seen_hashes)) {
       unique_networks[[length(unique_networks) + 1]] <- mat
