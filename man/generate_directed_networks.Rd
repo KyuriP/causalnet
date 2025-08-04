@@ -32,22 +32,3 @@ optionally allowing bidirectional edges (2-node feedback loops). Users may also
 specify a fixed direction constraint matrix to enforce known edge directions.
 Redundant networks due to symmetric flips are removed automatically.
 }
-\examples{
-# Define a triangle network skeleton
-adj <- matrix(0, 3, 3)
-adj[1, 2] <- adj[2, 1] <- 1
-adj[2, 3] <- adj[3, 2] <- 1
-adj[3, 1] <- adj[1, 3] <- 1
-
-# Generate all directed versions
-nets_all <- generate_directed_networks(adj)
-length(nets_all)
-
-# Fix A -> B and C <-> A
-fixed <- matrix(NA, 3, 3)
-fixed[1, 2] <- 1  # A → B
-fixed[3, 1] <- 2  # C ↔ A
-nets_fixed <- generate_directed_networks(adj, allow_bidirectional = TRUE, fixed_edges = fixed)
-length(nets_fixed)
-
-}
