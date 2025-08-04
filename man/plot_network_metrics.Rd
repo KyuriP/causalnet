@@ -2,16 +2,31 @@
 % Please edit documentation in R/summarize_network_metrics.R
 \name{plot_network_metrics}
 \alias{plot_network_metrics}
-\title{Plot Network Metrics Summary (ggplot2 version)}
+\title{Generate ggplot objects summarizing network metrics}
 \usage{
-plot_network_metrics(summary_df)
+plot_network_metrics(
+  summary_df,
+  n_bins = 6,
+  fill_colors = c("skyblue", "darkgreen", "orange", "lightcoral"),
+  base_size = 14,
+  return_grid = TRUE
+)
 }
 \arguments{
-\item{summary_df}{A data frame returned by \code{summarize_network_metrics()}.}
+\item{summary_df}{Data frame from \code{summarize_network_metrics()}.}
+
+\item{n_bins}{Number of histogram bins (default = 6).}
+
+\item{fill_colors}{Optional vector of 4 fill colors.}
+
+\item{base_size}{Base font size for plots (default = 14).}
+
+\item{return_grid}{If TRUE, returns cowplot grid; otherwise, returns list of plots.}
 }
 \value{
-A grid of ggplot2 visualizations.
+A cowplot grid or a named list of ggplot2 objects.
 }
 \description{
-Visualize summary statistics across a set of directed networks using ggplot2.
+Produces a list of ggplot2 objects visualizing summary metrics
+across a list of directed networks.
 }

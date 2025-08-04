@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate_dynamics.R
 \name{simulate_dynamics}
 \alias{simulate_dynamics}
-\title{Simulate Symptom Dynamics Using SDEs (Park et al. 2025 Model or Custom)}
+\title{Simulate Symptom Dynamics Using SDEs (Park et al. 2025 Model, Linear, or Custom)}
 \usage{
 simulate_dynamics(
   adj_matrix,
@@ -10,6 +10,7 @@ simulate_dynamics(
   t_max = 100,
   dt = 0.1,
   S0 = NULL,
+  model_type = "nonlinear",
   model_fn = NULL,
   stress_event = NULL
 )
@@ -17,12 +18,16 @@ simulate_dynamics(
 \arguments{
 \item{adj_matrix}{A directed adjacency matrix representing the network.}
 
-\item{params}{A named list of model parameters. For the default model, this must include:
+\item{params}{A named list of model parameters. For the nonlinear model, this must include:
 \itemize{
 \item \code{beta}: Vector of excitatory weights from other nodes.
 \item \code{alpha_self}: Vector of self-activation parameters.
 \item \code{delta}: Vector controlling non-linear amplification of incoming effects.
 \item \code{sigma}: Vector of Gaussian noise levels for each node.
+}
+For the linear model, only:
+\itemize{
+\item \code{beta}, \code{alpha_self}, \code{sigma}
 }
 For a custom model, this can include any named parameters used inside your model function.}
 
@@ -30,7 +35,9 @@ For a custom model, this can include any named parameters used inside your model
 
 \item{dt}{Simulation time step size.}
 
-\item{S0}{Optional initial symptom levels. If \code{NULL}, defaults to a small constant (0.01) for all nodes.}
+\item{S0}{Optional initial symptom levels. If NULL, defaults to a small constant (0.01) for all nodes.}
+
+\item{model_type}{Either "nonlinear" (default), "linear", or NULL (use custom model_fn).}
 
 \item{model_fn}{Optional. A custom function with signature \code{function(current, interaction, dt, ...)}
 that returns a vector of delta changes \code{dS}. The function should handle its own parameter inputs
@@ -44,24 +51,14 @@ A numeric matrix of symptom intensities over time. Rows = time steps, Columns = 
 }
 \description{
 Simulates the evolution of symptom dynamics in a network using stochastic differential equations (SDEs).
-Users may use the default model from Park et al. (2025), or provide a custom model function.
+Users may use the default nonlinear model from Park et al. (2025), a linear simplified model, or provide a custom model function.
 }
 \examples{
-# Using the default model
 net <- matrix(c(0, 1, 0, 0,
                 0, 0, 1, 0,
                 0, 0, 0, 1,
                 1, 0, 0, 0), nrow = 4, byrow = TRUE)
-params <- get_sample_parameters(n_nodes = 4)
-S <- simulate_dynamics(net, params)
-
-# Using a custom model
-my_model <- function(current, interaction, dt, beta, sigma) {
-  drift <- beta * interaction * dt
-  noise <- sigma * sqrt(dt) * rnorm(length(current))
-  drift + noise
-}
-custom_params <- list(beta = rep(0.8, 4), sigma = rep(0.05, 4))
-S2 <- simulate_dynamics(net, custom_params, model_fn = my_model)
+params_linear <- list(beta = rep(0.8, 4), alpha_self = rep(0.2, 4), sigma = rep(0.05, 4))
+S <- simulate_dynamics(net, params_linear, model_type = "linear")
 
 }

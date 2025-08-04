@@ -57,55 +57,64 @@ utils::globalVariables(c(
 ))
 
 
-#' Plot Network Metrics Summary (ggplot2 version)
+#' Generate ggplot objects summarizing network metrics
 #'
-#' Visualize summary statistics across a set of directed networks using ggplot2.
+#' Produces a list of ggplot2 objects visualizing summary metrics
+#' across a list of directed networks.
 #'
-#' @param summary_df A data frame returned by `summarize_network_metrics()`.
-#' @return A grid of ggplot2 visualizations.
+#' @param summary_df Data frame from `summarize_network_metrics()`.
+#' @param n_bins Number of histogram bins (default = 6).
+#' @param fill_colors Optional vector of 4 fill colors.
+#' @param base_size Base font size for plots (default = 14).
+#' @param return_grid If TRUE, returns cowplot grid; otherwise, returns list of plots.
+#' @return A cowplot grid or a named list of ggplot2 objects.
 #' @export
-#' @importFrom ggplot2 ggplot aes geom_histogram geom_jitter geom_violin labs theme_minimal
-#' @importFrom ggplot2 scale_x_continuous
-#' @importFrom cowplot plot_grid
-#' @importFrom stats na.omit
 
-plot_network_metrics <- function(summary_df) {
+plot_network_metrics <- function(summary_df,
+                                 n_bins = 6,
+                                 fill_colors = c("skyblue", "darkgreen", "orange", "lightcoral"),
+                                 base_size = 14,
+                                 return_grid = TRUE) {
 
-  # Plot 1: Distribution of number of loops
-  p1 <- ggplot(summary_df, aes(x = num_loops)) +
-    geom_histogram(binwidth = 1, fill = "skyblue", color = "black", alpha = 0.8) +
+  stopifnot(length(fill_colors) == 4)
+
+  plots <- list()
+
+  plots$p1 <- ggplot(summary_df, aes(x = num_loops)) +
+    geom_histogram(bins = n_bins, fill = fill_colors[1], color = "black", alpha = 0.8) +
     labs(title = "Distribution of Feedback Loops",
          x = "Number of Loops", y = "Frequency") +
-    theme_minimal()
+    theme_minimal(base_size = base_size)
 
-  # Plot 2: Degree variability distribution per number of loops
-  p2 <- ggplot(summary_df, aes(x = factor(num_loops), y = sigma_total)) +
-    #geom_violin(fill = "lightgreen", alpha = 0.4, color = NA) +
-    geom_jitter(width = 0.2, size = 1, color = "darkgreen", alpha = 0.8) +
+  plots$p2 <- ggplot(summary_df, aes(x = factor(num_loops), y = sigma_total)) +
+    geom_jitter(width = 0.2, size = 1.2, color = fill_colors[2], alpha = 0.8) +
     labs(title = "Degree Variability by Loop Count",
          x = "Number of Loops", y = "Sigma Total") +
-    theme_minimal()
+    theme_minimal(base_size = base_size)
 
-  # Plot 3: Node overlap score distribution
-  p3 <- ggplot(summary_df, aes(x = node_overlap_score)) +
-    geom_histogram(binwidth = 0.2, fill = "orange", color = "black", alpha = 0.8) +
+  plots$p3 <- ggplot(summary_df, aes(x = node_overlap_score)) +
+    geom_histogram(bins = n_bins, fill = fill_colors[3], color = "black", alpha = 0.8) +
     labs(title = "Node Overlap Score",
          x = "Overlap Index", y = "Frequency") +
-    theme_minimal()
+    theme_minimal(base_size = base_size)
 
-  # Plot 4: Average loop size (omit NA)
-  p4 <- ggplot(na.omit(summary_df), aes(x = avg_loop_size)) +
-    geom_histogram(binwidth = 0.2, fill = "lightcoral", color = "black", alpha = 0.8) +
+  plots$p4 <- ggplot(na.omit(summary_df), aes(x = avg_loop_size)) +
+    geom_histogram(bins = n_bins, fill = fill_colors[4], color = "black", alpha = 0.8) +
     labs(title = "Average Loop Size",
          x = "Loop Size", y = "Frequency") +
-    theme_minimal()
+    theme_minimal(base_size = base_size)
 
-  # Arrange in 2x2 grid
-  # Arrange with subplot tags
-  cowplot::plot_grid(
-    p1, p2, p3, p4,
-    labels = c("a", "b", "c", "d"),
-    label_size = 14,
-    ncol = 2
-  )
+  if (return_grid) {
+    label_size <- base_size * 1.2  # scale index label size proportionally
+    return(
+      cowplot::plot_grid(
+        plots$p1, plots$p2, plots$p3, plots$p4,
+        labels = c("a", "b", "c", "d"),
+        label_size = label_size,
+        ncol = 2
+      )
+    )
+  } else {
+    return(plots)
   }
+}

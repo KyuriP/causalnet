@@ -2,20 +2,52 @@
 % Please edit documentation in R/generate_directed_networks.R
 \name{generate_directed_networks}
 \alias{generate_directed_networks}
-\title{Generate All Directed Networks with Optional Bidirectional Edges}
+\title{Generate All Directed Networks with Optional Bidirectional Edges and Fixed Constraints}
 \usage{
-generate_directed_networks(adj_matrix, allow_bidirectional = TRUE)
+generate_directed_networks(
+  adj_matrix,
+  allow_bidirectional = TRUE,
+  fixed_edges = NULL
+)
 }
 \arguments{
 \item{adj_matrix}{A symmetric adjacency matrix representing the undirected skeleton.}
 
 \item{allow_bidirectional}{Logical. If TRUE, include bidirectional (A <-> B) edge options.}
+
+\item{fixed_edges}{Optional matrix of same size as adj_matrix. Use:
+\itemize{
+\item 1: enforce edge from A to B (i.e., fixed_edges\link{A,B} = 1)
+\item 2: enforce bidirectional edge (A <-> B)
+\item NA or 0: no constraint
+(Constraints can be placed in either \link{i,j} or \link{j,i})
+}}
 }
 \value{
-A list of unique directed adjacency matrices.
+A list of unique directed adjacency matrices consistent with the input structure and constraints.
 }
 \description{
 Given an undirected adjacency matrix, generate all valid directed versions,
-optionally including bidirectional edges (2-node feedback loops).
-Redundant networks due to symmetric bidirectional flips are removed.
+optionally allowing bidirectional edges (2-node feedback loops). Users may also
+specify a fixed direction constraint matrix to enforce known edge directions.
+Redundant networks due to symmetric flips are removed automatically.
+}
+\examples{
+# Define a triangle network skeleton
+adj <- matrix(0, 3, 3)
+adj[1, 2] <- adj[2, 1] <- 1
+adj[2, 3] <- adj[3, 2] <- 1
+adj[3, 1] <- adj[1, 3] <- 1
+
+# Generate all directed versions
+nets_all <- generate_directed_networks(adj)
+length(nets_all)
+
+# Fix A -> B and C <-> A
+fixed <- matrix(NA, 3, 3)
+fixed[1, 2] <- 1  # A → B
+fixed[3, 1] <- 2  # C ↔ A
+nets_fixed <- generate_directed_networks(adj, allow_bidirectional = TRUE, fixed_edges = fixed)
+length(nets_fixed)
+
 }
