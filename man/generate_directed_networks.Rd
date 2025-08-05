@@ -19,8 +19,7 @@ generate_directed_networks(
 \itemize{
 \item 1: enforce edge from A to B (i.e., fixed_edges\link{A,B} = 1)
 \item 2: enforce bidirectional edge (A <-> B)
-\item NA or 0: no constraint
-(Constraints can be placed in either \link{i,j} or \link{j,i})
+\item NA: no constraint
 }}
 }
 \value{
