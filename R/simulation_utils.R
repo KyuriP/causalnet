@@ -78,43 +78,57 @@ utils::globalVariables(c("Time", "Symptom", "Value"))
 
 #' Plot Symptom Dynamics with Optional Stress Shading
 #'
-#' Visualizes symptom dynamics over time using ggplot2, with optional stress intervals.
+#' Visualizes symptom dynamics over time using ggplot2, with optional stress intervals and customizable styling.
 #'
 #' @param S Matrix of simulated symptoms (time x symptoms).
 #' @param stress_windows Optional: List of stress intervals, each as c(start, end).
 #' @param title Plot title.
 #' @param colors Optional: Vector of line colors.
 #' @param legend_labels Optional names for symptoms.
-#' @param show_lines If TRUE, show vertical dashed lines instead of shaded areas.
+#' @param show_lines If TRUE, shows vertical dashed lines instead of shaded rectangles.
+#' @param line_width Line width for symptom trajectories.
+#' @param line_alpha Line transparency (0–1).
+#' @param base_size Base font size for theme.
+#' @param label_stress If TRUE, adds a label above the stress window.
 #'
 #' @return A ggplot object.
 #' @export
-#' @importFrom ggplot2 ggplot aes geom_line annotate labs scale_color_manual theme_minimal theme coord_cartesian
-#' @importFrom ggplot2 element_blank margin geom_vline
-#' @importFrom tidyr pivot_longer
-#' @importFrom dplyr mutate
-#' @importFrom scales hue_pal
 plot_symptom_dynamics <- function(S,
                                   stress_windows = NULL,
                                   title = "Symptom Dynamics",
                                   colors = NULL,
                                   legend_labels = NULL,
-                                  show_lines = FALSE) {
+                                  show_lines = FALSE,
+                                  line_width = 0.8,
+                                  line_alpha = 1,
+                                  base_size = 14,
+                                  label_stress = TRUE) {
+  # Convert to long format
   df <- as.data.frame(S)
   df$Time <- seq_len(nrow(S))
+
+  # Use column names or assign default if missing
+  symptom_names <- colnames(S)
+  if (is.null(symptom_names)) {
+    colnames(df)[1:ncol(S)] <- paste0("V", seq_len(ncol(S)))
+    symptom_names <- colnames(df)[1:ncol(S)]
+  }
+
   df_long <- tidyr::pivot_longer(df, -Time, names_to = "Symptom", values_to = "Value")
 
+  # Handle colors and labels
   symptoms <- unique(df_long$Symptom)
   if (is.null(colors)) colors <- scales::hue_pal()(length(symptoms))
   if (is.null(legend_labels)) legend_labels <- symptoms
 
+  # Base plot
   p <- ggplot2::ggplot(df_long, ggplot2::aes(x = Time, y = Value, color = Symptom)) +
-    ggplot2::geom_line(linewidth = 0.7) +
+    ggplot2::geom_line(linewidth = line_width, alpha = line_alpha) +
     ggplot2::scale_color_manual(values = colors, labels = legend_labels) +
     ggplot2::labs(title = title, x = "Time", y = "Symptom Level", color = NULL) +
-    ggplot2::theme_minimal(base_size = 14)
+    ggplot2::theme_minimal(base_size = base_size)
 
-  # Add stress window visual cues
+  # Add stress window cues
   if (!is.null(stress_windows)) {
     for (window in stress_windows) {
       if (length(window) != 2) next
@@ -128,12 +142,13 @@ plot_symptom_dynamics <- function(S,
       }
     }
 
-    # Label stress period
-    mid <- mean(stress_windows[[1]])
-    p <- p + ggplot2::annotate("text", x = mid, y = 1.05, label = "Stress Period",
-                               vjust = 0, size = 4) +
-      ggplot2::coord_cartesian(clip = "off") +
-      ggplot2::theme(plot.margin = ggplot2::margin(10, 10, 10, 10))
+    if (label_stress && !show_lines) {
+      mid <- mean(stress_windows[[1]])
+      p <- p + ggplot2::annotate("text", x = mid, y = 1.05, label = "Stress Period",
+                                 vjust = 0, size = 4) +
+        ggplot2::coord_cartesian(clip = "off") +
+        ggplot2::theme(plot.margin = ggplot2::margin(10, 10, 10, 10))
+    }
   }
 
   return(p)
