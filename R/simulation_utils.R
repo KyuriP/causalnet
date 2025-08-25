@@ -80,11 +80,11 @@ utils::globalVariables(c("Time", "Symptom", "Value"))
 #'
 #' Visualizes symptom dynamics over time using ggplot2, with optional stress intervals and customizable styling.
 #'
-#' @param S Matrix of simulated symptoms (time x symptoms).
+#' @param S Matrix of simulated state variables (time x symptoms).
 #' @param stress_windows Optional: List of stress intervals, each as c(start, end).
 #' @param title Plot title.
 #' @param colors Optional: Vector of line colors.
-#' @param legend_labels Optional names for symptoms.
+#' @param legend_labels Optional names for variables.
 #' @param show_lines If TRUE, shows vertical dashed lines instead of shaded rectangles.
 #' @param line_width Line width for symptom trajectories.
 #' @param line_alpha Line transparency (0–1).

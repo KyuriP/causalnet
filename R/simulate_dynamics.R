@@ -89,9 +89,17 @@ simulate_dynamics <- function(adj_matrix,
     if (!is.null(stress_event)) {
       dS <- dS + stress_event(t * dt, current)
     }
-    S[t + 1, ] <- pmin(pmax(current + dS, 0), 1)
+    if (model_type == "nonlinear") {
+      S[t + 1, ] <- pmin(pmax(current + dS, 0), 1)
+    } else {
+      S[t + 1, ] <- current + dS
+    }  }
+  # If input matrix has names, assign them to output
+  if (!is.null(colnames(adj_matrix))) {
+    colnames(S) <- colnames(adj_matrix)
+  } else if (!is.null(names(params$beta))) {
+    colnames(S) <- names(params$beta)
   }
-
   S
 }
 
