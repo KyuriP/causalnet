@@ -18,6 +18,7 @@
 #'        the number of valid networks becomes extremely large.
 #'        Set this to a smaller number (e.g., 1000) to explore a random subset
 #'        or for quick diagnostics.
+#' @param show_progress Logical. Show a text progress bar (default = TRUE).
 #'
 #' @return List of unique directed adjacency matrices with names preserved.
 #' @export
@@ -25,7 +26,8 @@
 generate_directed_networks <- function(adj_matrix,
                                        allow_bidirectional = TRUE,
                                        fixed_edges = NULL,
-                                       max_networks = Inf) {
+                                       max_networks = Inf,
+                                       show_progress = TRUE) {
   if (!is.matrix(adj_matrix) || !all(adj_matrix == t(adj_matrix))) {
     stop("adj_matrix must be a symmetric matrix.")
   }
