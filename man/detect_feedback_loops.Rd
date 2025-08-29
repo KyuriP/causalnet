@@ -4,15 +4,19 @@
 \alias{detect_feedback_loops}
 \title{Detect Unique Feedback Loops in a Directed Network}
 \usage{
-detect_feedback_loops(adj_matrix)
+detect_feedback_loops(adj_matrix, include_self_loops = FALSE, use_names = TRUE)
 }
 \arguments{
-\item{adj_matrix}{A square directed adjacency matrix (non-zero = edge).}
+\item{adj_matrix}{Square directed adjacency (non-zero = edge).}
+
+\item{include_self_loops}{Logical; include 1-node self-loops (default FALSE).}
+
+\item{use_names}{Logical; return node names if available (default TRUE).}
 }
 \value{
-A list of unique loops, each as a sorted vector of node indices.
+List of unique loops, each as a sorted vector (names if available, else indices).
 }
 \description{
-Detects all directed cycles in a graph, including 2-node loops,
-and returns each as a unique set of nodes (ignores order and entry point).
+Detects all directed cycles (including 2-node loops) and returns each as a
+unique set of nodes (ignores order and entry point).
 }

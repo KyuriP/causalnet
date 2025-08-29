@@ -2,32 +2,43 @@
 % Please edit documentation in R/generate_directed_networks.R
 \name{generate_directed_networks}
 \alias{generate_directed_networks}
-\title{Generate All Directed Networks with Optional Bidirectional Edges and Fixed Constraints}
+\title{Generate All Directed Networks Consistent with Constraints}
 \usage{
 generate_directed_networks(
   adj_matrix,
   allow_bidirectional = TRUE,
-  fixed_edges = NULL
+  fixed_edges = NULL,
+  max_networks = Inf,
+  show_progress = interactive()
 )
 }
 \arguments{
-\item{adj_matrix}{A symmetric adjacency matrix representing the undirected skeleton.}
+\item{adj_matrix}{Symmetric binary (0/1) adjacency matrix (undirected skeleton).}
 
-\item{allow_bidirectional}{Logical. If TRUE, include bidirectional (A <-> B) edge options.}
+\item{allow_bidirectional}{Logical. Allow bidirectional A↔B edges (default = TRUE).}
 
-\item{fixed_edges}{Optional matrix of same size as adj_matrix. Use:
+\item{fixed_edges}{Matrix of same size as adj_matrix. Use:
 \itemize{
-\item 1: enforce edge from A to B (i.e., fixed_edges\link{A,B} = 1)
-\item 2: enforce bidirectional edge (A <-> B)
-\item NA: no constraint
+\item 1: force edge from A to B (A → B),
+\item 2: force bidirectional (A ↔ B),
+\item NA or 0: unconstrained,
+\item -1: forbid edge from A to B.
 }}
+
+\item{max_networks}{Optional. Maximum number of networks to return (default = Inf).
+Useful to prevent memory overload when constraints are loose and
+the number of valid networks becomes extremely large.
+Set this to a smaller number (e.g., 1000) to explore a random subset
+or for quick diagnostics.}
+
+\item{show_progress}{Logical. Show a text progress bar (default = interactive()).}
 }
 \value{
-A list of unique directed adjacency matrices consistent with the input structure and constraints.
+List of unique directed adjacency matrices with names preserved.
 }
 \description{
-Given an undirected adjacency matrix, generate all valid directed versions,
-optionally allowing bidirectional edges (2-node feedback loops). Users may also
-specify a fixed direction constraint matrix to enforce known edge directions.
-Redundant networks due to symmetric flips are removed automatically.
+Given an undirected adjacency matrix, this function generates all possible
+directed networks consistent with its skeleton and any user-specified
+direction constraints. Optionally includes bidirectional edges and
+(optionally) shows a progress bar.
 }
