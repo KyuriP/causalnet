@@ -16,25 +16,29 @@
 summarize_network_metrics <- function(net_list) {
   all_summaries <- lapply(seq_along(net_list), function(i) {
     net <- net_list[[i]]
+    nodes <- colnames(net)
 
-    # Detect and deduplicate feedback loops
-    raw_loops <- detect_feedback_loops(net)
-    unique_loops <- unique(lapply(raw_loops, function(loop) sort(loop)))
+    # loops -> indices
+    raw_loops <- detect_feedback_loops(net)  # if possible: use_names = FALSE here
+    to_idx <- function(loop) if (is.character(loop)) match(loop, nodes) else as.integer(loop)
+    unique_loops <- unique(lapply(raw_loops, function(loop) sort(unique(to_idx(loop)))))
+    unique_loops <- lapply(unique_loops, function(v) v[!is.na(v)])
 
-    # Metrics
     num_loops <- length(unique_loops)
-    in_deg <- rowSums(net != 0)
-    out_deg <- colSums(net != 0)
+
+    # degrees (i -> j convention)
+    out_deg <- rowSums(net != 0)
+    in_deg  <- colSums(net != 0)
     sigma_total <- sd(in_deg) + sd(out_deg)
 
-    # Node overlap score
+    # overlap
     freq <- rep(0, nrow(net))
-    for (loop in unique_loops) freq[loop] <- freq[loop] + 1
-    overlap <- if (num_loops >= 2) sum(freq^2) / num_loops^2 else 0
+    for (loop in unique_loops) if (length(loop)) freq[loop] <- freq[loop] + 1
+    node_overlap_score <- if (num_loops >= 2) sum(freq^2, na.rm = TRUE) / (num_loops^2) else 0
 
-    # Loop sizes
-    loop_sizes <- sapply(unique_loops, length)
-    avg_loop_size <- if (length(loop_sizes) > 0) mean(loop_sizes) else NA
+    # loop sizes
+    loop_sizes <- lengths(unique_loops)
+    avg_loop_size <- if (num_loops > 0) mean(loop_sizes) else NA_real_
 
     data.frame(
       net_id = i,
@@ -42,13 +46,14 @@ summarize_network_metrics <- function(net_list) {
       n_edges = sum(net != 0),
       num_loops = num_loops,
       sigma_total = sigma_total,
-      node_overlap_score = overlap,
+      node_overlap_score = node_overlap_score,
       avg_loop_size = avg_loop_size
     )
   })
-
   do.call(rbind, all_summaries)
 }
+
+
 
 
 # Declare global vars to avoid R CMD check NOTE
