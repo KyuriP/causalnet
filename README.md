@@ -4,13 +4,13 @@
 
 # causalnet
 
-`causalnet` is an R package for **enumerating**, **constraining**, and **analyzing** directed causal networks derived from an undirected or **partially directed** skeleton. It includes:
+`causalnet` is an R package for enumerating and analyzing directed causal networks derived from an undirected or *partially directed* skeleton. It includes:
 
 - Enumeration of all orientation-consistent digraphs (honors one-way and bidirectional constraints via `fixed_edges`).
-- Feedback-loop detection (including 2-node cycles) and de-duplication.
+- Feedback-loop detection.
 - Topology summaries (loop count, degree variability, node-overlap score, average loop size) with ggplot visuals.
 - Dynamic simulation of node states via Euler–Maruyama SDEs  
-  – built-in **nonlinear** model (default), **linear**, or a **custom** update;  
+  – built-in *nonlinear* model (default), *linear*, or a *custom* update;  
   – optional exogenous stress input `stress_event(t, state)`;  
   – boundary handling: `"reflect"`, `"clamp"`, `"none"`, or `"auto"`.
   
