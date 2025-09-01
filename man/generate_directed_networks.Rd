@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate_directed_networks.R
 \name{generate_directed_networks}
 \alias{generate_directed_networks}
-\title{Generate All Directed Networks Consistent with Constraints}
+\title{Generate Directed Networks Consistent with Constraints}
 \usage{
 generate_directed_networks(
   adj_matrix,
@@ -13,32 +13,59 @@ generate_directed_networks(
 )
 }
 \arguments{
-\item{adj_matrix}{Symmetric binary (0/1) adjacency matrix (undirected skeleton).}
+\item{adj_matrix}{Symmetric binary (0/1) adjacency matrix giving the
+undirected skeleton. Only pairs with \code{adj_matrix[i, j] = 1} are
+considered for orientation; all other pairs remain 0.}
 
-\item{allow_bidirectional}{Logical. Allow bidirectional A↔B edges (default = TRUE).}
+\item{allow_bidirectional}{Logical. If \code{TRUE}, bidirected edges
+(\code{i <-> j}) are allowed during enumeration. Default: \code{TRUE}.}
 
-\item{fixed_edges}{Matrix of same size as adj_matrix. Use:
+\item{fixed_edges}{Numeric matrix the same size as \code{adj_matrix} that
+encodes per-edge constraints (interpreted on the directed \code{i -> j} entry):
 \itemize{
-\item 1: force edge from A to B (A → B),
-\item 2: force bidirectional (A ↔ B),
-\item NA or 0: unconstrained,
-\item -1: forbid edge from A to B.
-}}
+\item \code{1}: force \code{i -> j}
+\item \code{2}: force \code{i <-> j} (both \code{i -> j} and \code{j -> i})
+\item \code{0} or \code{NA}: unconstrained
+}
+Constraints on pairs not present in the skeleton are ignored.}
 
-\item{max_networks}{Optional. Maximum number of networks to return (default = Inf).
-Useful to prevent memory overload when constraints are loose and
-the number of valid networks becomes extremely large.
-Set this to a smaller number (e.g., 1000) to explore a random subset
-or for quick diagnostics.}
+\item{max_networks}{Integer. Maximum number of networks to return. Use to cap
+output size when constraints are loose and the search space is large.
+Default: \code{Inf}.}
 
-\item{show_progress}{Logical. Show a text progress bar (default = interactive()).}
+\item{show_progress}{Logical. Show a text progress bar during enumeration.
+Default: \code{interactive()}.}
 }
 \value{
-List of unique directed adjacency matrices with names preserved.
+A list of unique directed 0/1 adjacency matrices, each with the same
+dimensions and dimnames as \code{adj_matrix}.
 }
 \description{
-Given an undirected adjacency matrix, this function generates all possible
-directed networks consistent with its skeleton and any user-specified
-direction constraints. Optionally includes bidirectional edges and
-(optionally) shows a progress bar.
+Enumerate all directed adjacency matrices that are consistent with a given
+undirected skeleton and optional direction constraints. Enumeration can
+optionally include bidirected edges and display a simple progress bar.
+}
+\details{
+If the skeleton has \eqn{m} undirected edges, the number of
+orientation-consistent digraphs is at most \eqn{2^m} when
+\code{allow_bidirectional = FALSE} and \eqn{3^m} when \code{TRUE}
+(before applying constraints). Consider setting \code{max_networks}
+for exploratory use.
+}
+\examples{
+skel <- matrix(0, 3, 3); skel[upper.tri(skel)] <- 1; skel <- skel + t(skel)
+colnames(skel) <- rownames(skel) <- paste0("X", 1:3)
+out <- generate_directed_networks(skel, allow_bidirectional = TRUE)
+length(out)
+
+# Force X1 -> X2 and X2 <-> X3:
+F <- matrix(NA_real_, 3, 3, dimnames = dimnames(skel))
+F["X1", "X2"] <- 1
+F["X2", "X3"] <- 2
+out2 <- generate_directed_networks(skel, fixed_edges = F)
+length(out2)
+
+}
+\seealso{
+\code{\link{detect_feedback_loops}}, \code{\link{summarize_network_metrics}}
 }
