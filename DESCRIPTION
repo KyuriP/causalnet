@@ -3,7 +3,6 @@ Title: Directed Causal Network Enumeration and Simulation
 Version: 0.1.0
 Authors@R: 
     person("Kyuri", "Park", email = "kyurheep@gmail.com", role = c("aut", "cre"))
-Author: Kyuri Park
 Maintainer: Kyuri Park <kyurheep@gmail.com>
 Description: Generate all possible directed networks from a given undirected skeleton.
     Analyze feedback loops and simulate network dynamics using stochastic differential equations.

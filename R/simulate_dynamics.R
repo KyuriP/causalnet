@@ -1,6 +1,5 @@
 
 
-
 # internal helper: reflect overshoot back into [a, b]
 .reflect_bounds <- function(x, a, b) {
   w <- b - a
@@ -9,10 +8,7 @@
   a + ifelse(r <= w, r, 2 * w - r)
 }
 
-
-
-
-#' Simulate Network State Dynamics via SDEs (nonlinear, linear, or custom)
+#' Simulate network state dynamics via SDEs (nonlinear, linear, or custom)
 #'
 #' Simulates the evolution of node states in a directed network using an
 #' Euler–Maruyama discretization of stochastic differential equations (SDEs).
@@ -20,11 +16,11 @@
 #' custom update function.
 #'
 #' **Direction convention.** By default `adj[i, j] = 1` encodes a directed edge
-#' **i → j**. Under this convention, the *incoming input* to node *j* is the
-#' dot product of column *j* with the current state; in vector form
+#' `i -> j`. Under this convention, the *incoming input* to node `j` is the
+#' dot product of column `j` with the current state; in vector form
 #' `t(adj) %*% state`. If your internal convention differs, transpose accordingly.
 #'
-#' @param adj_matrix Numeric matrix (square; directed adjacency). Interpreted as i→j.
+#' @param adj_matrix Numeric matrix (square; directed adjacency). Interpreted as i -> j.
 #' @param params Named list of model parameters.
 #'   For `model_type = "nonlinear"`, requires vectors (length = n nodes):
 #'   \itemize{
@@ -36,7 +32,7 @@
 #'   For `model_type = "linear"`, requires \code{beta}, \code{alpha_self}, \code{sigma}.
 #'   For a custom model, include whatever your \code{model_fn} expects.
 #' @param t_max Total simulated time (must be > 0).
-#' @param dt Time step (must be > 0). The output has \code{floor(t_max/dt)+1} rows.
+#' @param dt Time step (must be > 0). The output has \code{floor(t_max/dt) + 1} rows.
 #' @param S0 Optional numeric vector of initial states (length = n). Defaults to 0.01.
 #' @param model_type One of \code{"nonlinear"} (default), \code{"linear"}, or \code{NULL}
 #'   when using a custom \code{model_fn}.
@@ -47,18 +43,12 @@
 #'   an exogenous input vector added each step (e.g., shocks/perturbations).
 #' @param boundary One of \code{"auto"}, \code{"reflect"}, \code{"clamp"}, \code{"none"}.
 #'   \itemize{
-#'     \item \code{"reflect"}: mirror overshoot back into \code{[clamp[1], clamp[2]]}
-#'           (reflecting boundary).
+#'     \item \code{"reflect"}: mirror overshoot back into \code{[clamp[1], clamp[2]]}.
 #'     \item \code{"clamp"}: hard-box to \code{[clamp[1], clamp[2]]}.
 #'     \item \code{"none"}: no bounding.
 #'     \item \code{"auto"}: pick a sensible default based on the model and \code{clamp}:
-#'           \itemize{
-#'             \item Nonlinear model → \code{boundary = "reflect"} and,
-#'                   if \code{clamp} is \code{NULL}, \code{clamp = c(0, 1)}.
-#'             \item Linear or custom model → if \code{clamp} is \code{NULL},
-#'                   use \code{boundary = "none"}; otherwise use \code{boundary = "clamp"} with
-#'                   the provided \code{clamp} range.
-#'           }
+#'       nonlinear -> \code{boundary = "reflect"} (and if \code{clamp} is \code{NULL}, use \code{c(0, 1)});
+#'       linear/custom -> \code{boundary = "none"} unless a clamp range is supplied, in which case use \code{"clamp"}.
 #'   }
 #' @param clamp Either \code{NULL} (no numeric range) or a length-2 numeric vector
 #'   \code{c(min, max)} used by \code{"reflect"} or \code{"clamp"} to keep states within bounds.
@@ -102,7 +92,6 @@
 #'
 #' @importFrom stats rnorm
 #' @export
-
 simulate_dynamics <- function(adj_matrix,
                               params,
                               t_max = 100,
@@ -111,7 +100,7 @@ simulate_dynamics <- function(adj_matrix,
                               model_type = "nonlinear",
                               model_fn = NULL,
                               stress_event = NULL,
-                              boundary = c("auto","reflect","clamp","none"),
+                              boundary = c("auto", "reflect", "clamp", "none"),
                               clamp = NULL) {
 
   boundary <- match.arg(boundary)
@@ -124,10 +113,10 @@ simulate_dynamics <- function(adj_matrix,
   if (is.null(S0)) S0 <- rep(0.01, n)
   if (!is.numeric(S0) || length(S0) != n) stop("S0 must be numeric length n.")
 
-  # choose model_fn (unchanged dynamics aside from boundary handling)
+  # choose model_fn (dynamics aside from boundary handling)
   if (is.null(model_fn)) {
     if (identical(model_type, "nonlinear")) {
-      required <- c("beta","alpha_self","delta","sigma")
+      required <- c("beta", "alpha_self", "delta", "sigma")
       if (!all(required %in% names(params))) {
         stop("Nonlinear model requires: beta, alpha_self, delta, sigma.")
       }
@@ -145,7 +134,7 @@ simulate_dynamics <- function(adj_matrix,
       model_fn <- model_fn_nl
 
     } else if (identical(model_type, "linear")) {
-      required <- c("beta","alpha_self","sigma")
+      required <- c("beta", "alpha_self", "sigma")
       if (!all(required %in% names(params))) {
         stop("Linear model requires: beta, alpha_self, sigma.")
       }
@@ -165,7 +154,8 @@ simulate_dynamics <- function(adj_matrix,
       stop("Provide model_fn or set model_type to 'linear' or 'nonlinear'.")
     }
   }
-  # --- boundary defaults ("auto") ---
+
+  # boundary defaults ("auto")
   if (boundary == "auto") {
     if (identical(model_type, "nonlinear")) {
       if (is.null(clamp)) clamp <- c(0, 1)
@@ -176,13 +166,13 @@ simulate_dynamics <- function(adj_matrix,
   }
 
   # validate clamp if needed
-  if (boundary %in% c("reflect","clamp")) {
+  if (boundary %in% c("reflect", "clamp")) {
     if (is.null(clamp) || length(clamp) != 2 || !is.numeric(clamp) || clamp[1] >= clamp[2]) {
       stop("clamp must be numeric c(min, max) with min < max when boundary is 'reflect' or 'clamp'.")
     }
   }
 
-  # --- simulate (Euler–Maruyama) ---
+  # simulate (Euler–Maruyama)
   n_steps <- floor(t_max / dt)
   S <- matrix(0, n_steps + 1, n)
   S[1, ] <- S0
@@ -190,17 +180,17 @@ simulate_dynamics <- function(adj_matrix,
 
   for (t in 1:n_steps) {
     current <- S[t, ]
-    # Keep your existing orientation for interaction:
-    # (If you use qgraph's i->j and want incoming, switch to t(adj_matrix) %*% current.)
-    interaction <- adj_matrix %*% current
-    interaction <- as.numeric(interaction)
+    # incoming influence to each node j: sum over i of adj[i, j] * state[i]
+    interaction <- as.numeric(t(adj_matrix) %*% current)
 
     args <- c(list(current = current, interaction = interaction, dt = dt), params)
     dS <- do.call(model_fn, args)
 
     if (!is.null(stress_event)) {
       ext <- stress_event(time_vec[t], current)
-      if (!is.numeric(ext) || length(ext) != n) stop("stress_event must return numeric length n.")
+      if (!is.numeric(ext) || length(ext) != n) {
+        stop("stress_event must return numeric length n.")
+      }
       dS <- dS + ext
     }
 
@@ -209,7 +199,7 @@ simulate_dynamics <- function(adj_matrix,
       next_state <- .reflect_bounds(next_state, clamp[1], clamp[2])
     } else if (boundary == "clamp") {
       next_state <- pmin(pmax(next_state, clamp[1]), clamp[2])
-    } # "none" -> leave as is
+    }
 
     S[t + 1, ] <- next_state
   }
