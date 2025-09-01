@@ -1,8 +1,12 @@
 ^causalnet\.Rproj$
 ^\.Rproj\.user$
-^LICENSE\.md$
 ^README\.Rmd$
+^LICENSE\.md$
+^LICENSE$
+^\.github$
+^\.git$
+^\.gitignore$
+^\.Rprofile$
 ^doc$
 ^Meta$
-^^\\.github$$
-^^LICENSE$$
+^\.DS_Store$
