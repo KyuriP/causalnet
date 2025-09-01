@@ -53,9 +53,9 @@
 #'     \item \code{"none"}: no bounding.
 #'     \item \code{"auto"}: pick a sensible default based on the model and \code{clamp}:
 #'           \itemize{
-#'             \item Nonlinear model \(\rightarrow\) \code{boundary = "reflect"} and,
+#'             \item Nonlinear model → \code{boundary = "reflect"} and,
 #'                   if \code{clamp} is \code{NULL}, \code{clamp = c(0, 1)}.
-#'             \item Linear or custom model \(\rightarrow\) if \code{clamp} is \code{NULL},
+#'             \item Linear or custom model → if \code{clamp} is \code{NULL},
 #'                   use \code{boundary = "none"}; otherwise use \code{boundary = "clamp"} with
 #'                   the provided \code{clamp} range.
 #'           }
@@ -69,7 +69,7 @@
 #'
 #' @section Boundary handling:
 #' - **Reflecting** avoids “sticky” edges by bouncing trajectories back inside the range,
-#'   which is useful for bounded variables on [0,1].
+#'   which is useful for bounded variables on `[0,1]`.
 #' - **Clamping** is numerically simple but can create artificial absorbing states at the limits.
 #' - For smoothly bounded dynamics, consider modeling on an unbounded latent scale and applying
 #'   a link (e.g., logistic) instead of hard post-step bounds.
@@ -95,7 +95,10 @@
 #' # Nonlinear model -> "auto" uses reflecting boundaries on [0,1]
 #' p_nl <- list(beta = rep(0.2, 4), alpha_self = rep(0.2, 4),
 #'              delta = rep(0.5, 4), sigma = rep(0.05, 4))
-#' S3 <- simulate_dynamics(net, p_nl, model_type = "nonlinear", boundary = "auto", t_max = 5, dt = 0.01)
+#' S3 <- simulate_dynamics(
+#'   net, p_nl, model_type = "nonlinear",
+#'   boundary = "auto", t_max = 5, dt = 0.01
+#' )
 #'
 #' @importFrom stats rnorm
 #' @export

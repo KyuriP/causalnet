@@ -16,17 +16,22 @@ plot_dynamics(
   base_size = 14,
   label_stress = TRUE,
   stress_label = "Stress Period",
+  stress_fill = "gray60",
+  stress_alpha = 0.2,
+  stress_line_color = "gray40",
   y_label = "Level",
   legend_position = "right",
   y_limits = NULL
 )
 }
 \arguments{
-\item{S}{Matrix (time x variables) of simulated states; if it has attr(S,"time"),
-that vector is used for the x-axis; otherwise Time = 1:nrow(S).}
+\item{S}{Matrix (time x variables) of simulated states. If \code{attr(S,"time")}
+exists, it is used for the x-axis (continuous time). Otherwise the x-axis
+is step index \code{1:nrow(S)}.}
 
-\item{stress_windows}{Optional list of numeric intervals, each c(start, end), in the
-same units as the x-axis (i.e., the Time column used for plotting).}
+\item{stress_windows}{Optional list of numeric \code{c(start, end)} intervals,
+or a 2-column matrix/data.frame with \code{start,end}. Units must match the
+x-axis (i.e., the "Time" used for plotting).}
 
 \item{title}{Plot title.}
 
@@ -42,13 +47,19 @@ same units as the x-axis (i.e., the Time column used for plotting).}
 
 \item{base_size}{Base font size for theme.}
 
-\item{label_stress}{If TRUE and using shading, label each stress window at the top.}
+\item{label_stress}{If TRUE and using shading, label each stress window.}
 
-\item{stress_label}{Text for stress labels (used if label_stress = TRUE).}
+\item{stress_label}{Text label (length 1 or length = #windows).}
 
-\item{y_label}{Y-axis label (default "Level" for domain-agnostic use).}
+\item{stress_fill}{Fill color for shaded windows.}
 
-\item{legend_position}{Legend position (e.g., "right","bottom","none").}
+\item{stress_alpha}{Alpha for shaded windows.}
+
+\item{stress_line_color}{Color for dashed lines (if \code{show_lines = TRUE}).}
+
+\item{y_label}{Y-axis label.}
+
+\item{legend_position}{Legend position (e.g., \code{"right"}, \code{"bottom"}, \code{"none"}).}
 
 \item{y_limits}{Optional numeric length-2 vector for y-axis limits.}
 }
