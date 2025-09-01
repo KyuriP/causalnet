@@ -136,12 +136,14 @@ simulate_dynamics <- function(adj_matrix,
           stop(sprintf("Parameter '%s' must be numeric length %d.", nm, n))
         }
       }
-      model_fn <- function(current, interaction, dt, beta, alpha_self, delta, sigma) {
+      model_fn_nl <- function(current, interaction, dt, beta, alpha_self, delta, sigma) {
         drift <- current * (1 - current) *
           (beta + alpha_self * current + interaction * (1 + delta * current)) * dt
         noise <- sigma * sqrt(dt) * stats::rnorm(length(current))
         drift + noise
       }
+      model_fn <- model_fn_nl
+
     } else if (identical(model_type, "linear")) {
       required <- c("beta","alpha_self","sigma")
       if (!all(required %in% names(params))) {
@@ -152,16 +154,17 @@ simulate_dynamics <- function(adj_matrix,
           stop(sprintf("Parameter '%s' must be numeric length %d.", nm, n))
         }
       }
-      model_fn <- function(current, interaction, dt, beta, alpha_self, sigma) {
+      model_fn_lin <- function(current, interaction, dt, beta, alpha_self, sigma) {
         drift <- (beta + alpha_self * current + interaction) * dt
         noise <- sigma * sqrt(dt) * stats::rnorm(length(current))
         drift + noise
       }
+      model_fn <- model_fn_lin
+
     } else {
       stop("Provide model_fn or set model_type to 'linear' or 'nonlinear'.")
     }
   }
-
   # --- boundary defaults ("auto") ---
   if (boundary == "auto") {
     if (identical(model_type, "nonlinear")) {
