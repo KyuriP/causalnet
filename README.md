@@ -4,11 +4,17 @@
 
 # causalnet
 
-`causalnet` is an R package for **enumerating** and **analyzing** all directed causal networks consistent with an undirected skeleton. It includes tools to **detect feedback loops**, compute simple **topology metrics**, and **simulate node dynamics** via SDEs (with optional stress inputs).
+`causalnet` is an R package for **enumerating**, **constraining**, and **analyzing** directed causal networks derived from an undirected or **partially directed** skeleton. It includes:
 
-> **Direction convention:** by default `adj[i, j] = 1` encodes a directed edge **i → j**.
-
----
+- Enumeration of all orientation-consistent digraphs (honors one-way and bidirectional constraints via `fixed_edges`).
+- Feedback-loop detection (including 2-node cycles) and de-duplication.
+- Topology summaries (loop count, degree variability, node-overlap score, average loop size) with ggplot visuals.
+- Dynamic simulation of node states via Euler–Maruyama SDEs  
+  – built-in **nonlinear** model (default), **linear**, or a **custom** update;  
+  – optional exogenous stress input `stress_event(t, state)`;  
+  – boundary handling: `"reflect"`, `"clamp"`, `"none"`, or `"auto"`.
+  
+  
 
 ## Installation
 
@@ -62,14 +68,6 @@ A full walk-through (enumeration → metrics → simulation → visuals) is avai
 quarto::quarto_preview("vignettes/causalnet_demo.qmd")
 ```
 
-## Key Features
-
-- *Enumerate* all directed networks consistent with an undirected or partially directed skeleton (supports direction constraints and bidirected edges).
-- *Analyze topology* with custom structural metrics (e.g., feedback loops, loop sizes/overlap, degree variability).
-- *Simulate dynamics* via Euler–Maruyama SDEs — nonlinear model by default, with linear and fully custom update functions supported.
-- *Visualize* structural metrics and dynamical trajectories with optional stress/shock input.
-
-
 
 ## Getting help / contributing
 
@@ -78,10 +76,7 @@ quarto::quarto_preview("vignettes/causalnet_demo.qmd")
 
 - **Questions / ideas:** open a Discussion or an Issue. 
 
-- **Pull requests:** happy to review. Please include:
-  - A brief description of the change and why it’s needed/useful.
-  - Tests (if applicable) and updated docs/Rd where relevant.
-  - A small example demonstrating the behavior before/after.
+- **Pull requests** welcome: add a short description, tests (if applicable), and updated docs where relevant.
 
 
 ## License
