@@ -81,7 +81,7 @@ quarto::quarto_preview("vignettes/causalnet_demo.qmd")
 
 ## License
 
-This project is released under the **GPL-3** license. See [`LICENSE`](LICENSE) for details.
+This project is released under the **GPL-3** license.
 
 
 
