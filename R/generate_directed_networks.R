@@ -1,26 +1,37 @@
 
-#' Generate All Directed Networks Consistent with Constraints
+#' Generate Directed Networks Consistent with Constraints
 #'
-#' Given an undirected adjacency matrix, this function generates all possible
-#' directed networks consistent with its skeleton and any user-specified
-#' direction constraints. Optionally includes bidirectional edges and
-#' (optionally) shows a progress bar.
+#' Enumerate all directed adjacency matrices that are consistent with a given
+#' undirected skeleton and optional direction constraints. Enumeration can
+#' optionally include bidirected edges and display a simple progress bar.
 #'
-#' @param adj_matrix Symmetric binary (0/1) adjacency matrix (undirected skeleton).
-#' @param allow_bidirectional Logical. Allow bidirectional A↔B edges (default = TRUE).
-#' @param fixed_edges Matrix of same size as adj_matrix. Use:
-#'   - 1: force edge from A to B (A → B),
-#'   - 2: force bidirectional (A ↔ B),
-#'   - NA or 0: unconstrained,
-#'   - -1: forbid edge from A to B.
-#' @param max_networks Optional. Maximum number of networks to return (default = Inf).
-#'        Useful to prevent memory overload when constraints are loose and
-#'        the number of valid networks becomes extremely large.
-#'        Set this to a smaller number (e.g., 1000) to explore a random subset
-#'        or for quick diagnostics.
-#' @param show_progress Logical. Show a text progress bar (default = interactive()).
+#' @param adj_matrix Symmetric binary (0/1) adjacency matrix giving the
+#'   undirected skeleton. Only pairs with \code{adj_matrix[i, j] = 1} are
+#'   considered for orientation; all other pairs remain 0.
+#' @param allow_bidirectional Logical. If \code{TRUE}, bidirected edges
+#'   (\code{i <-> j}) are allowed during enumeration. Default: \code{TRUE}.
+#' @param fixed_edges Numeric matrix the same size as \code{adj_matrix} that
+#'   encodes per-edge constraints (interpreted on the directed \code{i -> j} entry):
+#'   \itemize{
+#'     \item \code{1}: force \code{i -> j}
+#'     \item \code{2}: force \code{i <-> j} (both \code{i -> j} and \code{j -> i})
+#'     \item \code{0} or \code{NA}: unconstrained
+#'     \item \code{-1}: forbid \code{i -> j} (but \code{j -> i} may still be allowed)
+#'   }
+#'   Constraints on pairs not present in the skeleton are ignored.
+#' @param max_networks Integer. Maximum number of networks to return. Use to cap
+#'   output size when constraints are loose and the search space is large.
+#'   Default: \code{Inf}.
+#' @param show_progress Logical. Show a text progress bar during enumeration.
+#'   Default: \code{interactive()}.
 #'
-#' @return List of unique directed adjacency matrices with names preserved.
+#' @return A list of unique directed 0/1 adjacency matrices, each with the same
+#'   dimensions and dimnames as \code{adj_matrix}.
+#'
+#' @details The number of orientation-consistent digraphs can grow rapidly with
+#'   network size and sparsity; consider setting \code{max_networks} when exploring.
+#'
+#' @seealso \code{\link{detect_feedback_loops}}, \code{\link{summarize_network_metrics}}
 #' @export
 generate_directed_networks <- function(adj_matrix,
                                        allow_bidirectional = TRUE,
