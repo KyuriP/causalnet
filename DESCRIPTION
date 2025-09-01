@@ -24,4 +24,5 @@ Suggests:
     knitr,
     rmarkdown
 Config/testthat/edition: 3
-
+URL: https://github.com/KyuriP/causalnet
+BugReports: https://github.com/KyuriP/causalnet/issues
