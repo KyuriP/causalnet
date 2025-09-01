@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate_dynamics.R
 \name{simulate_dynamics}
 \alias{simulate_dynamics}
-\title{Simulate Network State Dynamics via SDEs (nonlinear, linear, or custom)}
+\title{Simulate network state dynamics via SDEs (nonlinear, linear, or custom)}
 \usage{
 simulate_dynamics(
   adj_matrix,
@@ -18,7 +18,7 @@ simulate_dynamics(
 )
 }
 \arguments{
-\item{adj_matrix}{Numeric matrix (square; directed adjacency). Interpreted as i→j.}
+\item{adj_matrix}{Numeric matrix (square; directed adjacency). Interpreted as i -> j.}
 
 \item{params}{Named list of model parameters.
 For \code{model_type = "nonlinear"}, requires vectors (length = n nodes):
@@ -33,7 +33,7 @@ For a custom model, include whatever your \code{model_fn} expects.}
 
 \item{t_max}{Total simulated time (must be > 0).}
 
-\item{dt}{Time step (must be > 0). The output has \code{floor(t_max/dt)+1} rows.}
+\item{dt}{Time step (must be > 0). The output has \code{floor(t_max/dt) + 1} rows.}
 
 \item{S0}{Optional numeric vector of initial states (length = n). Defaults to 0.01.}
 
@@ -49,18 +49,12 @@ an exogenous input vector added each step (e.g., shocks/perturbations).}
 
 \item{boundary}{One of \code{"auto"}, \code{"reflect"}, \code{"clamp"}, \code{"none"}.
 \itemize{
-\item \code{"reflect"}: mirror overshoot back into \code{[clamp[1], clamp[2]]}
-(reflecting boundary).
+\item \code{"reflect"}: mirror overshoot back into \code{[clamp[1], clamp[2]]}.
 \item \code{"clamp"}: hard-box to \code{[clamp[1], clamp[2]]}.
 \item \code{"none"}: no bounding.
 \item \code{"auto"}: pick a sensible default based on the model and \code{clamp}:
-\itemize{
-\item Nonlinear model → \code{boundary = "reflect"} and,
-if \code{clamp} is \code{NULL}, \code{clamp = c(0, 1)}.
-\item Linear or custom model → if \code{clamp} is \code{NULL},
-use \code{boundary = "none"}; otherwise use \code{boundary = "clamp"} with
-the provided \code{clamp} range.
-}
+nonlinear -> \code{boundary = "reflect"} (and if \code{clamp} is \code{NULL}, use \code{c(0, 1)});
+linear/custom -> \code{boundary = "none"} unless a clamp range is supplied, in which case use \code{"clamp"}.
 }}
 
 \item{clamp}{Either \code{NULL} (no numeric range) or a length-2 numeric vector
@@ -78,8 +72,8 @@ custom update function.
 }
 \details{
 \strong{Direction convention.} By default \code{adj[i, j] = 1} encodes a directed edge
-\strong{i → j}. Under this convention, the \emph{incoming input} to node \emph{j} is the
-dot product of column \emph{j} with the current state; in vector form
+\code{i -> j}. Under this convention, the \emph{incoming input} to node \code{j} is the
+dot product of column \code{j} with the current state; in vector form
 \code{t(adj) \%*\% state}. If your internal convention differs, transpose accordingly.
 
 Integration uses Euler–Maruyama. The per-step diffusion term is added
