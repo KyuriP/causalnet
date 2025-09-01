@@ -1,5 +1,5 @@
 ![R-CMD-check](https://github.com/KyuriP/causalnet/actions/workflows/R-CMD-check.yaml/badge.svg)
-[![License: GPL-3](https://img.shields.io/badge/License-GPL%203-blue.svg)](LICENSE)
+![License: GPL-3](https://img.shields.io/badge/License-GPL%203-blue.svg)
 [![lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
 # causalnet
