@@ -16,11 +16,11 @@ Imports:
     stats,
     ggplot2,
     tidyr,
-    dplyr,
     scales,
     cowplot
 Suggests:
     testthat (>= 3.0.0),
+    dplyr,
     knitr,
     rmarkdown
 Config/testthat/edition: 3
