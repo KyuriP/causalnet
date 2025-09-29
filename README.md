@@ -1,6 +1,8 @@
 ![R-CMD-check](https://github.com/KyuriP/causalnet/actions/workflows/R-CMD-check.yaml/badge.svg)
 ![License: GPL-3](https://img.shields.io/badge/License-GPL%203-blue.svg)
 [![lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.17227050)
+
 <img src="man/figures/causalnet_logo.png" align="right" alt="densityratio logo" width="100"/>
 # causalnet
 
