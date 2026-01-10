@@ -9,7 +9,9 @@ plot_network_metrics(
   n_bins = 6,
   fill_colors = c("skyblue", "darkgreen", "orange", "lightcoral"),
   base_size = 14,
-  return_grid = TRUE
+  return_grid = TRUE,
+  p2_style = c("auto", "jitter", "point", "beeswarm"),
+  auto_threshold = 200
 )
 }
 \arguments{
@@ -22,6 +24,12 @@ plot_network_metrics(
 \item{base_size}{Base font size for plots (default = 14).}
 
 \item{return_grid}{If TRUE, returns cowplot grid; otherwise, returns list of plots.}
+
+\item{p2_style}{How to plot panel (b) (sigma_total by loop count).
+One of "auto" (default), "jitter", "point", or "beeswarm".
+If "auto", uses beeswarm when \code{nrow(summary_df) < auto_threshold}, otherwise jitter.}
+
+\item{auto_threshold}{Threshold for switching when \code{p2_style = "auto"} (default = 200).}
 }
 \value{
 A cowplot grid or a named list of ggplot2 objects.
@@ -29,4 +37,23 @@ A cowplot grid or a named list of ggplot2 objects.
 \description{
 Produces a list of ggplot2 objects visualizing summary metrics
 across a list of directed networks.
+}
+\details{
+The "beeswarm" option uses \code{ggbeeswarm::geom_beeswarm()} if the ggbeeswarm package is
+installed. If not installed, the function falls back to jitter and emits a warning.
+}
+\examples{
+\dontrun{
+summary_df <- summarize_network_metrics(nets)
+
+# automatic switching
+plot_network_metrics(summary_df, p2_style = "auto", auto_threshold = 200)
+
+# force beeswarm
+plot_network_metrics(summary_df, p2_style = "beeswarm")
+
+# force jitter
+plot_network_metrics(summary_df, p2_style = "jitter")
+}
+
 }
