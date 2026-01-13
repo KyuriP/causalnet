@@ -16,7 +16,8 @@
 #'     \item \code{2}: force \code{i <-> j} (both \code{i -> j} and \code{j -> i})
 #'     \item \code{0} or \code{NA}: unconstrained
 #'   }
-#'   Constraints on pairs not present in the skeleton are ignored.
+#'   To exclude an edge entirely, set \code{adj_matrix[i,j] = adj_matrix[j,i] = 0} in the skeleton;
+#'   \code{fixed_edges} does not remove edges, it only constrains orientations of skeleton edges.
 #' @param max_networks Integer. Maximum number of networks to return. Use to cap
 #'   output size when constraints are loose and the search space is large.
 #'   Default: \code{Inf}.
